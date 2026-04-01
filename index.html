@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Writer's Idea Generator</title>
+</head>
+<body>
+    <header>
+        <h1>Welcome to the Writer's Idea Generator</h1>
+    </header>
+    <main>
+        <section id="idea-container">
+            <h2>Your Writing Idea</h2>
+            <p id="idea">Click the button for a new idea!</p>
+            <button id="generate-idea">Generate Idea</button>
+        </section>
+    </main>
+    <script>
+        const ideas = [
+            'Write a short story about a lost dog who finds his way home.',
+            'Create a character who can time travel, but only to moments in their own life.',
+            'Write a poem inspired by the changing seasons.',
+            'Describe a world where everyone can read each other’s thoughts.',
+            'Write a letter from a character living in a dystopian future to their past self.'
+        ];
+
+        document.getElementById('generate-idea').addEventListener('click', () => {
+            const randomIndex = Math.floor(Math.random() * ideas.length);
+            document.getElementById('idea').innerText = ideas[randomIndex];
+        });
+    </script>
+</body>
+</html>
