@@ -1,34 +1,80 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Writer's Idea Generator</title>
-</head>
-<body>
-    <header>
-        <h1>Welcome to the Writer's Idea Generator</h1>
-    </header>
-    <main>
-        <section id="idea-container">
-            <h2>Your Writing Idea</h2>
-            <p id="idea">Click the button for a new idea!</p>
-            <button id="generate-idea">Generate Idea</button>
-        </section>
-    </main>
-    <script>
-        const ideas = [
-            'Write a short story about a lost dog who finds his way home.',
-            'Create a character who can time travel, but only to moments in their own life.',
-            'Write a poem inspired by the changing seasons.',
-            'Describe a world where everyone can read each other’s thoughts.',
-            'Write a letter from a character living in a dystopian future to their past self.'
-        ];
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#1a1208;--parchment:#f5efe0;--gold:#c9a84c;--gold-dim:#8a6f2e;--ash:#6b5f4e}
+body{background:var(--ink);color:var(--parchment);font-family:'Cormorant Garamond',serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem}
+.container{max-width:680px;width:100%;text-align:center}
+.eyebrow{font-size:0.7rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+h1{font-family:'Playfair Display',serif;font-size:clamp(2.5rem,8vw,5rem);font-weight:900;line-height:0.95;color:var(--parchment);margin-bottom:0.4rem}
+h1 em{color:var(--gold);font-style:italic}
+.subtitle{font-size:1rem;color:var(--ash);font-style:italic;margin-bottom:2.5rem}
+.divider{display:flex;align-items:center;gap:1rem;margin-bottom:2rem}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:linear-gradient(to right,transparent,var(--gold-dim))}
+.divider::after{background:linear-gradient(to left,transparent,var(--gold-dim))}
+.divider span{color:var(--gold)}
+.categories{display:flex;gap:0.6rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem}
+.pill{padding:0.35rem 1rem;border:1px solid var(--gold-dim);border-radius:2px;font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--ash);cursor:pointer;background:transparent;font-family:'Cormorant Garamond',serif;transition:all 0.2s}
+.pill:hover,.pill.active{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+.card{background:rgba(245,239,224,0.04);border:1px solid rgba(201,168,76,0.2);border-radius:2px;padding:2.5rem 2rem;margin-bottom:2rem;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.card-type{font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;margin-bottom:1.2rem;font-weight:300}
+.card-type.story{color:#c9a84c}.card-type.twist{color:#c0451a}.card-type.world{color:#7aab8a}
+.idea-text{font-family:'Playfair Display',serif;font-size:clamp(1rem,3vw,1.35rem);font-style:italic;line-height:1.6;color:var(--parchment);transition:opacity 0.3s}
+.idea-text.fade{opacity:0}
+.placeholder{color:var(--ash)}
+.tags-row{display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap;margin-top:1.2rem;min-height:2rem}
+.tag{padding:0.2rem 0.7rem;background:rgba(201,168,76,0.1);border:1px solid rgba(201,168,76,0.2);border-radius:2px;font-size:0.7rem;color:var(--gold-dim);opacity:0;transform:translateY(4px);transition:all 0.3s}
+.tag.show{opacity:1;transform:translateY(0)}
+.btn-generate{display:inline-flex;align-items:center;gap:0.8rem;padding:1rem 2.5rem;background:var(--gold);color:var(--ink);border:none;border-radius:2px;font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.25s;margin-bottom:1rem}
+.btn-generate:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(201,168,76,0.3)}
+.btn-generate.spinning .icon{display:inline-block;animation:spin 0.6s linear}
+.actions{display:flex;gap:1rem;justify-content:center;margin-bottom:1.5rem}
+.btn-secondary{background:transparent;border:1px solid rgba(201,168,76,0.3);color:var(--ash);padding:0.5rem 1.2rem;font-family:'Cormorant Garamond',serif;font-size:0.85rem;cursor:pointer;transition:all 0.2s;border-radius:2px}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+.saved-section{margin-top:1.5rem}
+.saved-title{font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:1rem}
+.saved-list{display:flex;flex-direction:column;gap:0.6rem;max-height:200px;overflow-y:auto}
+.saved-item{background:rgba(245,239,224,0.03);border:1px solid rgba(201,168,76,0.1);border-radius:2px;padding:0.8rem 1rem;text-align:left;font-size:0.88rem;font-style:italic;color:var(--ash);display:flex;justify-content:space-between;gap:1rem}
+.saved-item-type{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold-dim);flex-shrink:0}
+.footer{margin-top:2.5rem;font-size:0.7rem;color:rgba(107,95,78,0.5);letter-spacing:0.1em}
+.counter{position:fixed;top:1rem;right:1rem;font-size:0.65rem;letter-spacing:0.2em;color:var(--gold-dim);text-transform:uppercase}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+</style>
 
-        document.getElementById('generate-idea').addEventListener('click', () => {
-            const randomIndex = Math.floor(Math.random() * ideas.length);
-            document.getElementById('idea').innerText = ideas[randomIndex];
-        });
-    </script>
-</body>
-</html>
+<div class="counter" id="counter">0 ideas forged</div>
+<div class="container">
+  <p class="eyebrow">A tool for storytellers</p>
+  <h1>The Writer's <em>Forge</em></h1>
+  <p class="subtitle">Where blank pages catch fire.</p>
+  <div class="divider"><span>✦</span></div>
+  <div class="categories">
+    <button class="pill active" onclick="setFilter(this,'all')">All Ideas</button>
+    <button class="pill" onclick="setFilter(this,'story')">Story Prompts</button>
+    <button class="pill" onclick="setFilter(this,'twist')">Plot Twists</button>
+    <button class="pill" onclick="setFilter(this,'world')">World-Building</button>
+  </div>
+  <div class="card" id="card">
+    <p class="idea-text placeholder" id="idea-text">Press the forge to ignite your first idea...</p>
+    <div class="tags-row" id="tags-row"></div>
+  </div>
+  <button class="btn-generate" id="btn" onclick="generateIdea()">
+    <span class="icon">⚒</span> Forge an Idea
+  </button>
+  <div class="actions">
+    <button class="btn-secondary" onclick="saveIdea()">⊕ Save</button>
+    <button class="btn-secondary" id="copy-btn" onclick="copyIdea()">⧉ Copy</button>
+  </div>
+  <div class="saved-section" id="saved-section" style="display:none">
+    <p class="saved-title">✦ Saved Ideas</p>
+    <div class="saved-list" id="saved-list"></div>
+  </div>
+  <p class="footer">Built by Grant Omage · #MyFirstWebsite</p>
+</div>
+
+<script>
+const ideas={story:[{text:"A blind cartographer must map a city that rearranges itself every midnight — guided only by sound and the unreliable memory of its oldest resident.",tags:["mystery","urban fantasy","disability"]},{text:"Two siblings inherit their grandmother's bookshop, only to discover she had been corresponding with fictional characters who are now demanding to be freed.",tags:["magical realism","family","books"]},{text:"A grief counsellor who can literally enter the memories of the bereaved begins losing the boundary between her clients' sorrows and her own.",tags:["psychological","supernatural","identity"]},{text:"The last translator of a dying language must decide whether to preserve it perfectly — or let it evolve and survive impurely.",tags:["cultural","language","sacrifice"]},{text:"A boy from Lagos discovers his shadow belongs to someone else — a stranger living a parallel life on the other side of the world.",tags:["coming-of-age","duality","African fiction"]},{text:"An architect is commissioned to design a prison with no walls — and must reckon with what truly confines people.",tags:["architecture","philosophy","crime"]},{text:"A war photographer returns home and begins seeing the scenes she captured playing out again — but with different endings.",tags:["trauma","time","war"]}],twist:[{text:"The mentor who guided the hero across three acts was the original villain — executing a plan that required a hero to exist.",tags:["betrayal","long game","morality"]},{text:"The world the characters have been trying to save is revealed to be a simulation running inside the mind of a dying child.",tags:["reality","sacrifice","bittersweet"]},{text:"The prophecy was always true — the characters simply misidentified which one of them it referred to.",tags:["fate","misdirection","classic"]},{text:"The antagonist wins. The final chapter follows them living with what that victory actually costs.",tags:["subversive","character study","dark"]},{text:"The map the crew followed was drawn by someone who had never left home — every landmark imagined from books and rumour.",tags:["adventure","unreliable","irony"]},{text:"The letter that started the entire conflict was never sent. Someone else wrote a forgery — for reasons that made perfect sense to them.",tags:["epistolary","motivation","tragedy"]}],world:[{text:"A continent where grief is a physical substance — harvested, traded, and weaponised by those who have learned to feel nothing.",tags:["dark fantasy","economy","emotion"]},{text:"A civilisation built entirely underground after the surface became sacred — no one alive has seen the sky, but everyone prays toward it.",tags:["religion","isolation","worldbuilding"]},{text:"Magic is inherited only from the parent you least resemble, creating a society obsessed with tracing hidden resemblances.",tags:["magic system","family","social structure"]},{text:"A city at the centre of three warring empires that has survived by selling a single resource: perfect neutrality.",tags:["politics","diplomacy","urban"]},{text:"Every lie spoken aloud leaves a visible mark on the speaker — a society built around the art of technically-true deception.",tags:["magic system","language","society"]},{text:"Time moves differently in the capital — one hour there equals one day in the provinces. The powerful grow old slowly. The poor age fast.",tags:["inequality","time","dystopia"]}]};
+let currentIdea=null,currentType=null,activeFilter='all',count=0;
+function setFilter(el,type){document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));el.classList.add('active');activeFilter=type}
+function generateIdea(){const btn=document.getElementById('btn');btn.classList.add('spinning');setTimeout(()=>btn.classList.remove('spinning'),600);let pool=[];if(activeFilter==='all'){Object.entries(ideas).forEach(([type,list])=>list.forEach(idea=>pool.push({...idea,type})))}else{pool=ideas[activeFilter].map(idea=>({...idea,type:activeFilter}))}const pick=pool[Math.floor(Math.random()*pool.length)];currentIdea=pick.text;currentType=pick.type;const textEl=document.getElementById('idea-text');const tagsRow=document.getElementById('tags-row');const labels={story:'Story Prompt',twist:'Plot Twist',world:'World-Building'};textEl.classList.add('fade');setTimeout(()=>{let badge=document.getElementById('card-type-badge');if(!badge){badge=document.createElement('p');badge.id='card-type-badge';badge.className='card-type';document.getElementById('card').insertBefore(badge,textEl)}badge.className=`card-type ${pick.type}`;badge.textContent=labels[pick.type];textEl.textContent=pick.text;textEl.classList.remove('placeholder','fade');tagsRow.innerHTML='';pick.tags.forEach((tag,i)=>{const t=document.createElement('span');t.className='tag';t.textContent=tag;tagsRow.appendChild(t);setTimeout(()=>t.classList.add('show'),i*80)});count++;document.getElementById('counter').textContent=`${count} idea${count!==1?'s':''} forged`},300)}
+function saveIdea(){if(!currentIdea)return;const section=document.getElementById('saved-section');const list=document.getElementById('saved-list');section.style.display='block';const labels={story:'Story',twist:'Twist',world:'World'};const item=document.createElement('div');item.className='saved-item';item.innerHTML=`<span>${currentIdea}</span><span class="saved-item-type">${labels[currentType]}</span>`;list.appendChild(item);list.scrollTop=list.scrollHeight}
+function copyIdea(){if(!currentIdea)return;const btn=document.getElementById('copy-btn');navigator.clipboard.writeText(currentIdea).then(()=>{btn.textContent='✓ Copied';setTimeout(()=>btn.textContent='⧉ Copy',1500)}).catch(()=>{const ta=document.createElement('textarea');ta.value=currentIdea;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);btn.textContent='✓ Copied';setTimeout(()=>btn.textContent='⧉ Copy',1500)})}
+      </script>
